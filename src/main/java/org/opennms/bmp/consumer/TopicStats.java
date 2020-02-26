@@ -28,21 +28,14 @@
 
 package org.opennms.bmp.consumer;
 
-import java.util.List;
 import java.util.Map;
 
-public interface MessageStats {
+public interface TopicStats {
 
-    List<String> getTopicNames();
+    long getMsgCount();
 
-    long getNumMessagesForTopic(String topic);
+    long getLastConsumedMsgTimestampMs();
 
-    long getLastMessageTimestampForTopic(String topic);
-
-    Map.Entry<Object, Object> getLastMessageForTopic(String topic);
-
-    void logMessageForTopic(String topic, Object k, Object v);
-
-    void clearStats();
+    Map.Entry<Object, Object> getLastMsg();
 
 }

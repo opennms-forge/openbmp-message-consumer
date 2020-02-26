@@ -36,45 +36,53 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
-public class MessageStatsImpl implements MessageStats {
-    private static final AtomicLong ZERO = new AtomicLong();
-    private final Map<String, AtomicLong> msgCount = new ConcurrentHashMap<>();
-    private final Map<String, Long> msgTimestamp = new ConcurrentHashMap<>();
-    private final Map<String, Map.Entry<Object,Object>> lastMsg = new ConcurrentHashMap<>();
+public class DefaultTopicStatManager implements TopicStatManager {
+    private final Map<String, TopicStatsImpl> topicStats = new ConcurrentHashMap<>();
 
     @Override
     public List<String> getTopicNames() {
-        return msgCount.keySet().stream()
+        return topicStats.keySet().stream()
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
     }
 
     @Override
-    public long getNumMessagesForTopic(String topic) {
-        return msgCount.getOrDefault(topic, ZERO).get();
-    }
-
-    @Override
-    public long getLastMessageTimestampForTopic(String topic) {
-        return msgTimestamp.get(topic);
-    }
-
-    @Override
-    public Map.Entry<Object, Object> getLastMessageForTopic(String topic) {
-        return lastMsg.get(topic);
+    public TopicStats getTopicStats(String topic) {
+        return topicStats.get(topic);
     }
 
     @Override
     public void logMessageForTopic(String topic, Object k, Object v) {
-        msgCount.computeIfAbsent(topic, t -> new AtomicLong()).incrementAndGet();
-        msgTimestamp.put(topic, System.currentTimeMillis());
-        lastMsg.put(topic, new AbstractMap.SimpleEntry<>(k, v));
+        final TopicStatsImpl stats = topicStats.computeIfAbsent(topic, t -> new TopicStatsImpl());
+        stats.msgCount.incrementAndGet();
+        stats.lastConsumedMessageTimestampMs = System.currentTimeMillis();
+        stats.lastMsg = new AbstractMap.SimpleEntry<>(k, v);
     }
 
     @Override
     public void clearStats() {
-        msgCount.clear();
-        msgTimestamp.clear();
-        lastMsg.clear();
+        topicStats.clear();
     }
+
+    private static class TopicStatsImpl implements TopicStats {
+        private final AtomicLong msgCount = new AtomicLong();
+        private long lastConsumedMessageTimestampMs;
+        private Map.Entry<Object, Object> lastMsg;
+
+        @Override
+        public long getMsgCount() {
+            return msgCount.get();
+        }
+
+        @Override
+        public long getLastConsumedMsgTimestampMs() {
+            return lastConsumedMessageTimestampMs;
+        }
+
+        @Override
+        public Map.Entry<Object, Object> getLastMsg() {
+            return lastMsg;
+        }
+    }
+
 }

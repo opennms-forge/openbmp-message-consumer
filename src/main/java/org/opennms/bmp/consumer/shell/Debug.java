@@ -35,36 +35,42 @@ import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
 import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
-import org.opennms.bmp.consumer.MessageStats;
+import org.opennms.bmp.consumer.TopicStatManager;
+import org.opennms.bmp.consumer.TopicStats;
 
 @Service
 @Command(scope = "bmp", name = "debug", description = "Debug")
 public class Debug implements Action {
 
     @Reference
-    private MessageStats messageStats;
+    private TopicStatManager topicStatManager;
 
-    @Option(name = "clear")
+    @Option(name = "-c", aliases = "--clear", description = "Clear statistics for topics")
     private boolean clear = false;
 
-    @Option(name = "show")
+    @Option(name = "-s", aliases = "--show", description = "Show last message on topics")
     private boolean show = false;
 
     @Override
     public Object execute() {
         System.out.println("Number of messages by topic:");
         long now = System.currentTimeMillis();
-        for (String topic : messageStats.getTopicNames()) {
-            long lastMessageMs = messageStats.getLastMessageTimestampForTopic(topic);
-            long secsSinceLastMessage = Math.floorDiv(now - lastMessageMs, 1000L);
-            System.out.printf("%s: %d (%d seconds ago)\n", topic, messageStats.getNumMessagesForTopic(topic), secsSinceLastMessage);
+        for (String topic : topicStatManager.getTopicNames()) {
+            final TopicStats topicStats = topicStatManager.getTopicStats(topic);
+            if (topicStats == null) {
+                System.out.printf("%s: no messages\n", topic);
+                continue;
+            }
+
+            long secsSinceLastMessage = Math.max(Math.floorDiv(now - topicStats.getLastConsumedMsgTimestampMs(), 1000L), 0);
+            System.out.printf("%s: %d (last consumed %d seconds ago)\n", topic, topicStats.getMsgCount(), secsSinceLastMessage);
             if (show) {
-                Map.Entry<Object,Object> entry = messageStats.getLastMessageForTopic(topic);
+                Map.Entry<Object,Object> entry = topicStats.getLastMsg();
                 System.out.printf("K: %s\nV: %s\n\n", entry.getKey(), entry.getValue());
             }
         }
         if (clear) {
-            messageStats.clearStats();
+            topicStatManager.clearStats();
         }
         return null;
     }

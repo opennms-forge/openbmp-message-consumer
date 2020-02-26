@@ -56,10 +56,10 @@ public class Consumer implements Runnable {
     private ScheduledExecutorService scheduler;
     private KafkaStreams streams;
     private final AtomicBoolean closed = new AtomicBoolean(true);
-    private final MessageStats messageStats;
+    private final TopicStatManager topicStatManager;
 
-    public Consumer(MessageStats messageStats) {
-        this.messageStats = Objects.requireNonNull(messageStats);
+    public Consumer(TopicStatManager topicStatManager) {
+        this.topicStatManager = Objects.requireNonNull(topicStatManager);
     }
 
     public void init() {
@@ -73,7 +73,7 @@ public class Consumer implements Runnable {
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("[OpenBMP] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
                 }
-                messageStats.logMessageForTopic(topic, k, v);
+                topicStatManager.logMessageForTopic(topic, k, v);
             });
         }
         for (String topic : topics) {
@@ -82,7 +82,7 @@ public class Consumer implements Runnable {
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
                 }
-                messageStats.logMessageForTopic(topic, k, v);
+                topicStatManager.logMessageForTopic(topic, k, v);
             });
         }
         final Topology topology = builder.build();
