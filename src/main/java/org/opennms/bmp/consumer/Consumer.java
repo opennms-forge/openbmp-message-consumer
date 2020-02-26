@@ -84,8 +84,8 @@ public class Consumer implements Runnable {
         for (String topic : topics) {
             final String effectiveTopicName = "opennms." + topic;
             builder.stream(effectiveTopicName).foreach((k,v) -> {
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
                 }
                 topicStatManager.logMessageForTopic(effectiveTopicName, k, v);
             });
