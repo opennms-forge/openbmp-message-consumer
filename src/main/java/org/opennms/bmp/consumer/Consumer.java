@@ -37,6 +37,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -106,6 +107,8 @@ public class Consumer implements Runnable {
         // Default values
         streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "openbmp-message-consumer");
         streamsProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        streamsProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
+        streamsProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         streamsProperties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         streamsProperties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         return streamsProperties;
