@@ -28,12 +28,19 @@
 
 package org.opennms.bmp.consumer;
 
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Date;
+import java.util.List;
 
 public interface MessageStats {
 
-    Map<String, AtomicLong> getNumMessagesByTopic();
+    List<String> getTopicNames();
+
+    long getNumMessagesForTopic(String topic);
+
+    long getLastMessageForTopic(String topic);
 
     void incrementNumMessageForTopic(String topic);
+
+    void clearStats();
+
 }
