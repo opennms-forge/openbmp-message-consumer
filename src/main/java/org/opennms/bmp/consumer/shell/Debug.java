@@ -34,8 +34,8 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opennms.bmp.consumer.MessageStats;
 
-@Command(scope = "bmp", name = "debug", description = "Debug")
 @Service
+@Command(scope = "bmp", name = "debug", description = "Debug")
 public class Debug implements Action {
 
     @Reference

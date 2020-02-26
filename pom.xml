@@ -15,7 +15,7 @@
         <slf4jVersion>1.7.30</slf4jVersion>
         <kafkaBundleVersion>2.3.0_1</kafkaBundleVersion>
         <kafkaVersion>2.3.0</kafkaVersion>
-        <karafVersion>4.1.5</karafVersion>
+        <karafVersion>4.2.6</karafVersion>
         <scalaVersion>2.12</scalaVersion>
     </properties>
 
@@ -33,6 +33,7 @@
                                 org.apache.karaf.shell*;version="[4,5)",
                                 *
                             </Import-Package>
+                            <Karaf-Commands>org.opennms.bmp.consumer.shell</Karaf-Commands>
                         </instructions>
                     </configuration>
                 </plugin>
