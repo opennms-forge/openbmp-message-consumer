@@ -28,7 +28,9 @@
 
 package org.opennms.bmp.consumer;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -58,12 +60,17 @@ public class Consumer implements Runnable {
 
         final Properties streamProperties = loadStreamsProperties();
         final StreamsBuilder builder = new StreamsBuilder();
-        builder.stream("openbmp.parsed.*").foreach((k,v) -> {
-            System.out.printf("[OpenBMP] Message received at time: %s\nKey: %s\n, Value: %s\n\n", new Date(), k, v);
-        });
-        builder.stream("opennms.openbmp.parsed.*").foreach((k,v) -> {
-            System.out.printf("[OpenNMS] Message received at time: %s\nKey: %s\n, Value: %s\n\n", new Date(), k, v);
-        });
+        final List<String> topics = Arrays.asList("openbmp.parsed.base_attribute", "openbmp.parsed.bmp_stat", "openbmp.parsed.collector", "openbmp.parsed.peer", "openbmp.parsed.router", "openbmp.parsed.unicast_prefix");
+        for (String topic : topics) {
+            builder.stream(topic).foreach((k,v) -> {
+                System.out.printf("[OpenBMP] Message received at time: %s\nKey: %s\n, Value: %s\n\n", new Date(), k, v);
+            });
+        }
+        for (String topic : topics) {
+            builder.stream("opennms." + topic).foreach((k,v) -> {
+                System.out.printf("[OpenNMS] Message received at time: %s\nKey: %s\n, Value: %s\n\n", new Date(), k, v);
+            });
+        }
         final Topology topology = builder.build();
 
         // Use the class-loader for the KStream class, since the kafka-client bundle
