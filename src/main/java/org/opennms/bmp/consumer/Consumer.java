@@ -105,7 +105,7 @@ public class Consumer implements Runnable {
     private Properties loadStreamsProperties() {
         final Properties streamsProperties = new Properties();
         // Default values
-        streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "openbmp-message-consumer");
+        streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "opennms-bmp-consumer");
         streamsProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
         streamsProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         streamsProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
