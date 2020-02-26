@@ -75,17 +75,17 @@ public class Consumer implements Runnable {
                 "openbmp.parsed.unicast_prefix");
         for (String topic : topics) {
             builder.stream(topic).foreach((k,v) -> {
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("[OpenBMP] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
-                }
+//                if (LOG.isTraceEnabled()) {
+//                    LOG.trace("[OpenBMP] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
+//                }
                 topicStatManager.logMessageForTopic(topic, k, v);
             });
         }
         for (String topic : topics) {
             final String effectiveTopicName = "opennms." + topic;
             builder.stream(effectiveTopicName).foreach((k,v) -> {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
                 }
                 topicStatManager.logMessageForTopic(effectiveTopicName, k, v);
             });
