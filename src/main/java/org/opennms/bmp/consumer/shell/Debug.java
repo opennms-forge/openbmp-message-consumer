@@ -34,7 +34,7 @@ import org.apache.karaf.shell.api.action.lifecycle.Reference;
 import org.apache.karaf.shell.api.action.lifecycle.Service;
 import org.opennms.bmp.consumer.MessageStats;
 
-@Command(scope = "opennms-openbmp", name = "debug", description = "Debug")
+@Command(scope = "bmp", name = "debug", description = "Debug")
 @Service
 public class Debug implements Action {
 
@@ -45,7 +45,7 @@ public class Debug implements Action {
     public Object execute() {
         System.out.println("Number of messages by topic:");
         messageStats.getNumMessagesByTopic().forEach((k,v) -> {
-            System.out.printf("%s: %d\b", k, v);
+            System.out.printf("%s: %s\n", k, v);
         });
         return null;
     }

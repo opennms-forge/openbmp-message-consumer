@@ -29,15 +29,21 @@
                     <extensions>true</extensions>
                     <configuration>
                         <instructions>
-                            <Bundle-RequiredExecutionEnvironment>JavaSE-${javaVersion}
-                            </Bundle-RequiredExecutionEnvironment>
-                            <Karaf-Commands>*</Karaf-Commands>
+                            <Import-Package>
+                                org.apache.karaf.shell*;version="[4,5)",
+                                *
+                            </Import-Package>
                         </instructions>
                     </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>karaf-services-maven-plugin</artifactId>
+                <version>${karafVersion}</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
