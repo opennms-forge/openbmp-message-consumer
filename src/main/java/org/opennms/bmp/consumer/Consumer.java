@@ -67,7 +67,12 @@ public class Consumer implements Runnable {
 
         final Properties streamProperties = loadStreamsProperties();
         final StreamsBuilder builder = new StreamsBuilder();
-        final List<String> topics = Arrays.asList("openbmp.parsed.base_attribute", "openbmp.parsed.bmp_stat", "openbmp.parsed.collector", "openbmp.parsed.peer", "openbmp.parsed.router", "openbmp.parsed.unicast_prefix");
+        final List<String> topics = Arrays.asList("openbmp.parsed.base_attribute",
+                "openbmp.parsed.bmp_stat",
+                "openbmp.parsed.collector",
+                "openbmp.parsed.peer",
+                "openbmp.parsed.router",
+                "openbmp.parsed.unicast_prefix");
         for (String topic : topics) {
             builder.stream(topic).foreach((k,v) -> {
                 if (LOG.isTraceEnabled()) {
@@ -82,7 +87,7 @@ public class Consumer implements Runnable {
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
                 }
-                topicStatManager.logMessageForTopic(topic, k, v);
+                topicStatManager.logMessageForTopic(effectiveTopicName, k, v);
             });
         }
         final Topology topology = builder.build();
