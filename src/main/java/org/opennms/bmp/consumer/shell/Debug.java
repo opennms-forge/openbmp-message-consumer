@@ -28,6 +28,8 @@
 
 package org.opennms.bmp.consumer.shell;
 
+import java.util.Map;
+
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -45,14 +47,21 @@ public class Debug implements Action {
     @Option(name = "clear")
     private boolean clear = false;
 
+    @Option(name = "show")
+    private boolean show = false;
+
     @Override
     public Object execute() {
         System.out.println("Number of messages by topic:");
         long now = System.currentTimeMillis();
         for (String topic : messageStats.getTopicNames()) {
-            long lastMessageMs = messageStats.getLastMessageForTopic(topic);
+            long lastMessageMs = messageStats.getLastMessageTimestampForTopic(topic);
             long secsSinceLastMessage = Math.floorDiv(now - lastMessageMs, 1000L);
             System.out.printf("%s: %d (%d seconds ago)\n", topic, messageStats.getNumMessagesForTopic(topic), secsSinceLastMessage);
+            if (show) {
+                Map.Entry<Object,Object> entry = messageStats.getLastMessageForTopic(topic);
+                System.out.printf("K: %s\nV: %s\n\n", entry.getKey(), entry.getValue());
+            }
         }
         if (clear) {
             messageStats.clearStats();

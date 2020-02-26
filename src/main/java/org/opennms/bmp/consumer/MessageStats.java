@@ -28,8 +28,8 @@
 
 package org.opennms.bmp.consumer;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface MessageStats {
 
@@ -37,9 +37,11 @@ public interface MessageStats {
 
     long getNumMessagesForTopic(String topic);
 
-    long getLastMessageForTopic(String topic);
+    long getLastMessageTimestampForTopic(String topic);
 
-    void incrementNumMessageForTopic(String topic);
+    Map.Entry<Object, Object> getLastMessageForTopic(String topic);
+
+    void logMessageForTopic(String topic, Object k, Object v);
 
     void clearStats();
 

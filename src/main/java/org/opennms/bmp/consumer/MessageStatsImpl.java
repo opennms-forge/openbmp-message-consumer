@@ -28,6 +28,7 @@
 
 package org.opennms.bmp.consumer;
 
+import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class MessageStatsImpl implements MessageStats {
     private static final AtomicLong ZERO = new AtomicLong();
     private final Map<String, AtomicLong> msgCount = new ConcurrentHashMap<>();
     private final Map<String, Long> msgTimestamp = new ConcurrentHashMap<>();
+    private final Map<String, Map.Entry<Object,Object>> lastMsg = new ConcurrentHashMap<>();
 
     @Override
     public List<String> getTopicNames() {
@@ -53,19 +55,26 @@ public class MessageStatsImpl implements MessageStats {
     }
 
     @Override
-    public long getLastMessageForTopic(String topic) {
+    public long getLastMessageTimestampForTopic(String topic) {
         return msgTimestamp.get(topic);
     }
 
     @Override
-    public void incrementNumMessageForTopic(String topic) {
-        msgCount.computeIfAbsent(topic, k -> new AtomicLong()).incrementAndGet();
+    public Map.Entry<Object, Object> getLastMessageForTopic(String topic) {
+        return lastMsg.get(topic);
+    }
+
+    @Override
+    public void logMessageForTopic(String topic, Object k, Object v) {
+        msgCount.computeIfAbsent(topic, t -> new AtomicLong()).incrementAndGet();
         msgTimestamp.put(topic, System.currentTimeMillis());
+        lastMsg.put(topic, new AbstractMap.SimpleEntry<>(k, v));
     }
 
     @Override
     public void clearStats() {
         msgCount.clear();
         msgTimestamp.clear();
+        lastMsg.clear();
     }
 }

@@ -73,7 +73,7 @@ public class Consumer implements Runnable {
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("[OpenBMP] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
                 }
-                messageStats.incrementNumMessageForTopic(topic);
+                messageStats.logMessageForTopic(topic, k, v);
             });
         }
         for (String topic : topics) {
@@ -82,7 +82,7 @@ public class Consumer implements Runnable {
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
                 }
-                messageStats.incrementNumMessageForTopic(effectiveTopicName);
+                messageStats.logMessageForTopic(topic, k, v);
             });
         }
         final Topology topology = builder.build();
@@ -120,6 +120,7 @@ public class Consumer implements Runnable {
         // Default values
         streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "opennms-bmp-consumer");
         streamsProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        streamsProperties.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/bmp-consumer");
         streamsProperties.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 0); // Commit as soon as possible
         streamsProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         streamsProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
