@@ -31,6 +31,7 @@ package org.opennms.bmp.consumer;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -55,6 +56,11 @@ public class Consumer implements Runnable {
     private ScheduledExecutorService scheduler;
     private KafkaStreams streams;
     private final AtomicBoolean closed = new AtomicBoolean(true);
+    private final MessageStats messageStats;
+
+    public Consumer(MessageStats messageStats) {
+        this.messageStats = Objects.requireNonNull(messageStats);
+    }
 
     public void init() {
         LOG.info("init()");
@@ -64,12 +70,19 @@ public class Consumer implements Runnable {
         final List<String> topics = Arrays.asList("openbmp.parsed.base_attribute", "openbmp.parsed.bmp_stat", "openbmp.parsed.collector", "openbmp.parsed.peer", "openbmp.parsed.router", "openbmp.parsed.unicast_prefix");
         for (String topic : topics) {
             builder.stream(topic).foreach((k,v) -> {
-                System.out.printf("[OpenBMP] Message received at time: %s\nKey: %s\n, Value: %s\n\n", new Date(), k, v);
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("[OpenBMP] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
+                }
+                messageStats.incrementNumMessageForTopic(topic);
             });
         }
         for (String topic : topics) {
-            builder.stream("opennms." + topic).foreach((k,v) -> {
-                System.out.printf("[OpenNMS] Message received at time: %s\nKey: %s\n, Value: %s\n\n", new Date(), k, v);
+            final String effectiveTopicName = "opennms." + topic;
+            builder.stream(effectiveTopicName).foreach((k,v) -> {
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
+                }
+                messageStats.incrementNumMessageForTopic(effectiveTopicName);
             });
         }
         final Topology topology = builder.build();
@@ -124,4 +137,5 @@ public class Consumer implements Runnable {
             LOG.error("Failed to start consumer stream", e);
         }
     }
+
 }

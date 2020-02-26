@@ -4,6 +4,11 @@
 		http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
 ">
 
-    <bean id="bmpConsumer" class="org.opennms.bmp.consumer.Consumer" init-method="init" destroy-method="destroy" />
+    <bean id="messageStats" class="org.opennms.bmp.consumer.MessageStatsImpl"/>
+    <service ref="messageStats" interface="org.opennms.bmp.consumer.MessageStats"/>
+
+    <bean id="bmpConsumer" class="org.opennms.bmp.consumer.Consumer" init-method="init" destroy-method="destroy">
+        <argument ref="messageStats"/>
+    </bean>
 
 </blueprint>
