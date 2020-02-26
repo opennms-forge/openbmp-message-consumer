@@ -120,6 +120,7 @@ public class Consumer implements Runnable {
         // Default values
         streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "opennms-bmp-consumer");
         streamsProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+        streamsProperties.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 0); // Commit as soon as possible
         streamsProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         streamsProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         streamsProperties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
