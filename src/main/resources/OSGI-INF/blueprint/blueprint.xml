@@ -7,8 +7,15 @@
     <bean id="topicStatManager" class="org.opennms.bmp.consumer.DefaultTopicStatManager"/>
     <service ref="topicStatManager" interface="org.opennms.bmp.consumer.TopicStatManager"/>
 
-    <bean id="bmpConsumer" class="org.opennms.bmp.consumer.Consumer" init-method="init" destroy-method="destroy">
+    <bean id="bmpConsumerOpenBMP" class="org.opennms.bmp.consumer.Consumer" init-method="init" destroy-method="destroy">
         <argument ref="topicStatManager"/>
+        <argument value="openbmp"/>
+        <argument value="192.168.20.8:9092"/>
     </bean>
 
+    <bean id="bmpConsumerOpenNMS" class="org.opennms.bmp.consumer.Consumer" init-method="init" destroy-method="destroy">
+        <argument ref="topicStatManager"/>
+        <argument value="opennms"/>
+        <argument value="192.168.21.8:9092"/>
+    </bean>
 </blueprint>

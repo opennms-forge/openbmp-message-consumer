@@ -29,7 +29,6 @@
 package org.opennms.bmp.consumer;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
@@ -58,8 +57,13 @@ public class Consumer implements Runnable {
     private final AtomicBoolean closed = new AtomicBoolean(true);
     private final TopicStatManager topicStatManager;
 
-    public Consumer(TopicStatManager topicStatManager) {
+    private final String name;
+    private final String bootstrapServers;
+
+    public Consumer(TopicStatManager topicStatManager, String name, String bootstrapServers) {
         this.topicStatManager = Objects.requireNonNull(topicStatManager);
+        this.name = Objects.requireNonNull(name);
+        this.bootstrapServers = Objects.requireNonNull(bootstrapServers);
     }
 
     public void init() {
@@ -75,19 +79,10 @@ public class Consumer implements Runnable {
                 "openbmp.parsed.unicast_prefix");
         for (String topic : topics) {
             builder.stream(topic).foreach((k,v) -> {
-//                if (LOG.isTraceEnabled()) {
-//                    LOG.trace("[OpenBMP] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
-//                }
-                topicStatManager.logMessageForTopic(topic, k, v);
-            });
-        }
-        for (String topic : topics) {
-            final String effectiveTopicName = "opennms." + topic;
-            builder.stream(effectiveTopicName).foreach((k,v) -> {
                 if (LOG.isTraceEnabled()) {
-                    LOG.trace("[opennms] Message received at time: {}\n Key: {}\n, Value: {}", new Date(), k, v);
+                    LOG.trace("[{}] Message received. Key: {}\n, Value: {}", name, k, v);
                 }
-                topicStatManager.logMessageForTopic(effectiveTopicName, k, v);
+                topicStatManager.logMessageForTopic(name, topic, k, v);
             });
         }
         final Topology topology = builder.build();
@@ -101,7 +96,7 @@ public class Consumer implements Runnable {
 
         // Defer startup to another thread
         scheduler = Executors.newScheduledThreadPool(1, new ThreadFactoryBuilder()
-                .setNameFormat("openbmp-message-consumer-%d")
+                .setNameFormat("openbmp-" + name + "-message-consumer-%d")
                 .build()
         );
         closed.set(false);
@@ -109,7 +104,7 @@ public class Consumer implements Runnable {
     }
 
     public void destroy() {
-        LOG.info("Destroying consumer...");
+        LOG.info("Destroying consumer for {}...", name);
         closed.set(true);
         if (scheduler != null) {
             scheduler.shutdown();
@@ -124,8 +119,8 @@ public class Consumer implements Runnable {
         final Properties streamsProperties = new Properties();
         // Default values
         streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "opennms-bmp-consumer");
-        streamsProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-        streamsProperties.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/bmp-consumer");
+        streamsProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        streamsProperties.put(StreamsConfig.STATE_DIR_CONFIG, String.format("/tmp/%s-consumer", name));
         streamsProperties.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 0); // Commit as soon as possible
         streamsProperties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         streamsProperties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
@@ -137,11 +132,11 @@ public class Consumer implements Runnable {
     @Override
     public void run() {
         try {
-            LOG.info("Starting consumer stream.");
+            LOG.info("Starting consumer stream for {}.", name);
             streams.start();
-            LOG.info("Consumer started.");
+            LOG.info("Consumer started for {}.", name);
         } catch (StreamsException | IllegalStateException e) {
-            LOG.error("Failed to start consumer stream", e);
+            LOG.error("Failed to start consumer stream for {}", name, e);
         }
     }
 

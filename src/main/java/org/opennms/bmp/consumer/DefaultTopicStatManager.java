@@ -37,23 +37,31 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class DefaultTopicStatManager implements TopicStatManager {
-    private final Map<String, TopicStatsImpl> topicStats = new ConcurrentHashMap<>();
+    private final Map<String, Map<String, TopicStatsImpl>> topicStatsByContext = new ConcurrentHashMap<>();
 
     @Override
-    public List<String> getTopicNames() {
-        return topicStats.keySet().stream()
+    public List<String> getContexts() {
+        return topicStatsByContext.keySet().stream()
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
     }
 
     @Override
-    public TopicStats getTopicStats(String topic) {
-        return topicStats.get(topic);
+    public List<String> getTopicNames(String context) {
+        return topicStatsByContext.get(context).keySet().stream()
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toList());
     }
 
     @Override
-    public void logMessageForTopic(String topic, Object k, Object v) {
-        final TopicStatsImpl stats = topicStats.computeIfAbsent(topic, t -> new TopicStatsImpl());
+    public TopicStats getTopicStats(String context, String topic) {
+        return topicStatsByContext.get(context).get(topic);
+    }
+
+    @Override
+    public void logMessageForTopic(String context, String topic, Object k, Object v) {
+        final TopicStatsImpl stats = topicStatsByContext.computeIfAbsent(context, c -> new ConcurrentHashMap<>())
+                .computeIfAbsent(topic, t -> new TopicStatsImpl());
         stats.msgCount.incrementAndGet();
         stats.lastConsumedMessageTimestampMs = System.currentTimeMillis();
         stats.lastMsg = new AbstractMap.SimpleEntry<>(k, v);
@@ -61,7 +69,7 @@ public class DefaultTopicStatManager implements TopicStatManager {
 
     @Override
     public void clearStats() {
-        topicStats.clear();
+        topicStatsByContext.clear();
     }
 
     private static class TopicStatsImpl implements TopicStats {

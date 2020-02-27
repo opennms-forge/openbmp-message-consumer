@@ -32,11 +32,13 @@ import java.util.List;
 
 public interface TopicStatManager {
 
-    List<String> getTopicNames();
+    List<String> getContexts();
 
-    TopicStats getTopicStats(String topic);
+    List<String> getTopicNames(String context);
 
-    void logMessageForTopic(String topic, Object k, Object v);
+    TopicStats getTopicStats(String context, String topic);
+
+    void logMessageForTopic(String context, String topic, Object k, Object v);
 
     void clearStats();
 
