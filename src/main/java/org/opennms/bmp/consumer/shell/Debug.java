@@ -75,7 +75,7 @@ public class Debug implements Action {
                 continue;
             }
 
-            System.out.printf("Number of messages by topic for context: %s\n", context);
+            System.out.printf("\n\nTopic statistics for context: %s\n", context);
             for (String topic : topicStatManager.getTopicNames(context)) {
                 if (topicFilter != null && !topicFilter.equalsIgnoreCase(topic)) {
                     continue;
@@ -91,7 +91,7 @@ public class Debug implements Action {
                 System.out.printf("%s: %d (last consumed %d seconds ago)\n", topic, topicStats.getMsgCount(), secsSinceLastMessage);
                 Map.Entry<Object,Object> entry = topicStats.getLastMsg();
                 if (show) {
-                    System.out.printf("K: %s\nV: %s\n\n", entry.getKey(), entry.getValue().toString().replace("\t", "$$$$"));
+                    System.out.printf("K: %s\nV: %s\n\n", entry.getKey(), entry.getValue().toString().replace("\t", "░"));
                 }
 
                 if (parse) {

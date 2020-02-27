@@ -118,7 +118,7 @@ public class Consumer implements Runnable {
     private Properties loadStreamsProperties() {
         final Properties streamsProperties = new Properties();
         // Default values
-        streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, "opennms-bmp-consumer");
+        streamsProperties.put(StreamsConfig.APPLICATION_ID_CONFIG, name + "-bmp-consumer");
         streamsProperties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         streamsProperties.put(StreamsConfig.STATE_DIR_CONFIG, String.format("/tmp/%s-consumer", name));
         streamsProperties.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 0); // Commit as soon as possible
