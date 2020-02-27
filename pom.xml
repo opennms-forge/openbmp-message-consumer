@@ -13,10 +13,8 @@
         <javaVersion>1.8</javaVersion>
         <guavaVersion>18.0</guavaVersion>
         <slf4jVersion>1.7.30</slf4jVersion>
-        <kafkaBundleVersion>2.3.0_1</kafkaBundleVersion>
-        <kafkaVersion>2.3.0</kafkaVersion>
+        <kafkaVersion>2.1.0</kafkaVersion>
         <karafVersion>4.2.6</karafVersion>
-        <scalaVersion>2.12</scalaVersion>
     </properties>
 
     <build>
@@ -106,46 +104,6 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>
             <version>${kafkaVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>kafka-clients</artifactId>
-                    <groupId>org.apache.kafka</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.kafka-clients</artifactId>
-            <version>${kafkaBundleVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.servicemix.bundles</groupId>
-            <artifactId>org.apache.servicemix.bundles.kafka_${scalaVersion}</artifactId>
-            <version>${kafkaBundleVersion}</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>log4j</artifactId>
-                    <groupId>log4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>slf4j-log4j12</artifactId>
-                    <groupId>org.slf4j</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>kafka-clients</artifactId>
-                    <groupId>org.apache.kafka</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.opennms.bundles</groupId>
